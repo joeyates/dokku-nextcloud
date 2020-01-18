@@ -1,4 +1,4 @@
-FROM nextcloud:14-fpm-alpine
+FROM nextcloud:18-fpm-alpine
 
 COPY sbin/* /sbin/
 
