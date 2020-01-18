@@ -1,7 +1,7 @@
 # Run Nextcloud as a Dokku app
 
 1. Install dokku plugins:
-   - [dokku-psql-single-container](https://github.com/Flink/dokku-psql-single-container)
+   - [dokku-postgres](https://github.com/dokku/dokku-postgres)
    - [dokku-require](https://github.com/crisward/dokku-require/)
 2. Clone/fork this repo
 3. Create `nextcloud` app
@@ -11,7 +11,7 @@
 In summary:
 
 ```bash
-dokku plugin:install https://github.com/Flink/dokku-psql-single-container
+dokku plugin:install https://github.com/dokku/dokku-postgres
 dokku plugin:install https://github.com/crisward/dokku-require/
 dokku apps:create nextcloud
 dokku config:set nextcloud NEXTCLOUD_ADMIN_USER=<SET_ME> NEXTCLOUD_ADMIN_PASSWORD=<SET_ME>

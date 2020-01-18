@@ -9,8 +9,8 @@
         "name": "proxy",
         "commands":["proxy:ports-set $APP http:80:9000"]
       },{
-        "name":"psql-single-container",
-        "commands":["psql:create $APP","psql:link $APP $APP"]
+        "name":"postgres",
+        "commands":["postgres:create $APP","postgres:link $APP $APP"]
       }
     ],
     "volumes": [

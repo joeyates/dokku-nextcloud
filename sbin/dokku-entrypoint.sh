@@ -1,17 +1,37 @@
 #!/bin/sh
 
-if [ "${DB_TYPE}" = "postgresql" ]
-then
-    export POSTGRES_DB="${DB_NAME}"
-    export POSTGRES_USER="${DB_USER}"
-    export POSTGRES_PASSWORD="${DB_PASS}"
-    export POSTGRES_HOST="${DB_HOST}"
+
+# parse db url, credit to pjz @ https://stackoverflow.com/a/17287984
+# extract the protocol
+proto="`echo $DATABASE_URL | grep '://' | sed -e's,^\(.*://\).*,\1,g'`"
+# remove the protocol
+url=`echo $DATABASE_URL | sed -e s,$proto,,g`
+
+# extract the user and password (if any)
+userpass="`echo $url | grep @ | cut -d@ -f1`"
+DB_PASS=`echo $userpass | grep : | cut -d: -f2`
+if [ -n "$DB_PASS" ]; then
+    DB_USER=`echo $userpass | grep : | cut -d: -f1`
 else
-    export MYSQL_DATABASE="${DB_PATH}"
-    export MYSQL_USER="${DB_USER}"
-    export MYSQL_PASSWORD="${DB_PASS}"
-    export MYSQL_HOST="${DB_HOST}"
+    DB_USER=$userpass
 fi
+
+# extract the host
+hostport=`echo $url | sed -e s,$userpass@,,g | cut -d/ -f1`
+DB_PORT=`echo $hostport | grep : | cut -d: -f2`
+if [ -n "$DB_PORT" ]; then
+    DB_HOST=`echo $hostport | grep : | cut -d: -f1`
+else
+    DB_HOST=$hostport
+fi
+
+# extract the path (if any)
+DB_NAME="`echo $url | grep / | cut -d/ -f2-`"
+
+export POSTGRES_DB="${DB_NAME}"
+export POSTGRES_USER="${DB_USER}"
+export POSTGRES_PASSWORD="${DB_PASS}"
+export POSTGRES_HOST="${DB_HOST}"
 
 # hacky and dumb as hell, but we have to override the parent entrypoint,
 # because they are doing some weird rsync fuckery there which deletes stuff like nginx.conf.sigil
