@@ -2,8 +2,7 @@ FROM nextcloud:18-fpm-alpine
 
 COPY sbin/* /sbin/
 
-RUN ["ls", "/sbin"]
-RUN ["chmod", "+x", "/sbin/docker-entrypoint.sh"]
+RUN ["chmod", "+x", "/sbin/dokku-entrypoint.sh"]
 
 ENTRYPOINT ["/sbin/dokku-entrypoint.sh"]
 
