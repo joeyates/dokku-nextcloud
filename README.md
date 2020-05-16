@@ -40,6 +40,7 @@ You'll also need to allow large uploads to your server if you're planning to use
 ```
 mkdir /home/dokku/nextcloud/nginx.conf.d/
 echo 'client_max_body_size 50000m;' > /home/dokku/nextcloud/nginx.conf.d/upload.conf
+echo 'proxy_read_timeout 600s;' >> /home/dokku/nextcloud/nginx.conf.d/upload.conf
 chown dokku:dokku /home/dokku/nextcloud/nginx.conf.d/upload.conf
 service nginx reload
 ```
