@@ -35,6 +35,14 @@ Because you're running with Dokku as a reverse proxy, you'll need to change your
 
 Make sure the value for `'overwrite.cli.url'` starts with https.
 
+You'll also need to allow large uploads to your server if you're planning to use client synchronisation.
+
+```
+mkdir /home/dokku/nextcloud/nginx.conf.d/
+echo 'client_max_body_size 50000m;' > /home/dokku/nextcloud/nginx.conf.d/upload.conf
+chown dokku:dokku /home/dokku/nextcloud/nginx.conf.d/upload.conf
+service nginx reload
+```
 
 ## Removing
 If you're unhappy with your setup, this'll remove everything forever:
