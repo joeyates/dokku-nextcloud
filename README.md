@@ -18,7 +18,7 @@ git push dokku
 Now back to your dokku server!
 
 ```sh
-dokku domains:add <your domain>
+dokku domains:add nextcloud <your domain>
 dokku letsencrypt nextcloud
 # Replace this path with where you want to store user files (can be a network disk).
 mkdir -p /var/lib/dokku/data/storage/nextcloud/data
@@ -30,15 +30,29 @@ chown www-data:www-data /var/lib/dokku/data/storage/nextcloud/config
 
 dokku storage:mount nextcloud /var/lib/dokku/data/storage/nextcloud/data:/var/www/html/data
 dokku storage:mount nextcloud /var/lib/dokku/data/storage/nextcloud/config:/var/www/html/config
-# required to create the mount files for some reason
+# required to create the mount files (we pushed earlier)
 dokku ps:restart nextcloud
 
-# You're nearly done! Visit <your domain> to finish configuration.
-# For the database, select postgres; you'll find the database credentials by running `dokku config nextcloud` and looking for DATABASE_URL: postgres://USER:PASSWORD@HOST:PORT/nextcloud
 ```
+You're nearly done! Visit `<your domain>` to finish configuration.
+
+Set up an admin account.
+Click on "Storage & database".
+Leave the data folder unchanged (`/var/www/html/data`)
+For the database, **select Postgres**; you'll find the database credentials by running `dokku config nextcloud` and looking for DATABASE_URL: it'll look like postgres://USER:PASSWORD@HOST:PORT/DBNAME, just fill-in the fields on the webpage.
+
+For instance, with `postgres://postgres:ae9e02101f9977e1fabb19f09605e486@dokku-postgres-nextcloud:5432/nextcloud`:
+
+* Database user: postgres
+* Database password: ae9e02101f9977e1fabb19f09605e486
+* Database name: nextcloud
+* Database host: dokku-postgres-nextcloud:5432
+
+Click on finish setup.
+
 
 ## Tweaks
-Because you're running with Dokku as a reverse proxy, you'll need to change your config.php file under /var/www/html/data to add this:
+If you're planning to use desktop client,  because you're running with Dokku as a reverse proxy, you'll need to change your config.php file under `/var/lib/dokku/data/storage/nextcloud/config` to add this:
 
 ```
 'overwriteprotocol' => 'https'
@@ -46,7 +60,7 @@ Because you're running with Dokku as a reverse proxy, you'll need to change your
 
 Make sure the value for `'overwrite.cli.url'` starts with https.
 
-You'll also need to allow large uploads to your server if you're planning to use client synchronisation.
+You'll also need to allow large uploads to your server:
 
 ```sh
 mkdir /home/dokku/nextcloud/nginx.conf.d/
@@ -56,8 +70,8 @@ chown dokku:dokku /home/dokku/nextcloud/nginx.conf.d/upload.conf
 service nginx reload
 ```
 
-## Removing
-If you're unhappy with your setup, this'll remove everything forever:
+## Uninstalling
+If you're unhappy with your setup, this'll remove everything *forever*:
 ```
 dokku apps:destroy nextcloud
 dokku postgres:destroy nextcloud
