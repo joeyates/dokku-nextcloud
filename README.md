@@ -76,6 +76,67 @@ chown dokku:dokku /home/dokku/nextcloud/nginx.conf.d/upload.conf
 service nginx reload
 ```
 
+## Upgrading
+
+To upgrade your Nextcloud version, you just need to choose which version
+to upgrade to and deploy it.
+
+Note: Before upgrading, it is wise to do a backup of your data, database
+and config.
+
+Nextcloud needs to be upgraded from major version to major version, so, if
+you want to upgrade to version 22.0.0 and you're on 18.0.4,
+you'll need to install some version of 19.x, 20.x and 21.x before installing
+your desired version.
+
+### Set The Version
+
+Choose which version of Nextcloud you want to deploy from [Docker Hub](https://hub.docker.com/_/nextcloud).
+
+### Script
+
+You can update the version configured on Dokku with the script
+`upgrade-dokku-nextcloud`.
+
+Before running the script, you'll need to set DOKKU_HOST to
+point to your Dokku host.
+
+```sh
+bin/upgrade-dokku-nextcloud {{NEW VERSION NUMBER}}
+git push dokku
+```
+
+The following environment variables can be used to override defaults:
+
+* DOKKU_USER - the remote Dokku user, defaults to 'dokku'
+* DOKKU_NEXTCLOUD_APP - the name of the Dokku app, defaults to 'nextcloud'
+* LOG_LEVEL - the verbosity of the script, the default, 1, gives minimal output, 2 is debug
+
+### Manual Method
+
+You need to **remove** old version setting and add the new one.
+
+Here's an example where we **unset** 18.0.4-apache and set 22.0.0-apache
+
+```sh
+$ dokku docker-options:report nextcloud
+=====> nextcloud docker options information
+       Docker options build:          --build-arg NEXTCLOUD_VERSION=18.0.4 --link dokku.postgres.nextcloud:dokku-postgres-nextcloud
+       Docker options deploy:         --link dokku.postgres.nextcloud:dokku-postgres-nextcloud --restart=on-failure:10 -v /var/lib/dokku/data/storage/nextcloud/config:/var/www/html/config -v /var/lib/dokku/data/storage/nextcloud/data:/var/www/html/data
+       Docker options run:            --link dokku.postgres.nextcloud:dokku-postgres-nextcloud -v /var/lib/dokku/data/storage/nextcloud/config:/var/www/html/config -v /var/lib/dokku/data/storage/nextcloud/data:/var/www/html/data
+$ dokku docker-options:remove nextcloud build "--build-arg NEXTCLOUD_VERSION=18.0.4"
+$ dokku docker-options:add nextcloud build "--build-arg NEXTCLOUD_VERSION=22.0.0"
+$ git push dokku
+```
+
+### Deploy
+
+Now you can just deploy as usual
+
+```sh
+git push dokku
+```
+
 ## Uninstalling
 If you're unhappy with your setup, this'll remove everything *forever*:
 ```

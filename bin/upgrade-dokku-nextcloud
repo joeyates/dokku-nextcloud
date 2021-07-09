@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+
+set -o errtrace
+set -o nounset
+set -o pipefail
+
+DOKKU_HOST=${DOKKU_HOST:-""}
+DOKKU_USER=${DOKKU_USER:-dokku}
+DOKKU_NEXTCLOUD_APP=${DOKKU_NEXTCLOUD_APP:-nextcloud}
+LOG_LEVEL=${LOG_LEVEL:-1}
+NEW_NEXTCLOUD_VERSION=${1:-}
+
+log() {
+  if [[ $LOG_LEVEL -ge 1 ]]; then
+    echo "$@"
+  fi
+}
+
+debug() {
+  if [[ $LOG_LEVEL -ge 2 ]]; then
+    echo "$@"
+  fi
+}
+
+die() {
+  echo "$@" >&2
+  exit 1
+}
+
+debug "DOKKU_HOST: $DOKKU_HOST"
+debug "DOKKU_USER: $DOKKU_USER"
+debug "DOKKU_NEXTCLOUD_APP: $DOKKU_NEXTCLOUD_APP"
+debug "LOG_LEVEL: $LOG_LEVEL"
+debug "NEW_NEXTCLOUD_VERSION: $NEW_NEXTCLOUD_VERSION"
+
+if [[ -z "${DOKKU_HOST}" ]]; then
+  die "Please set DOKKU_HOST to the host name of your Dokku host"
+fi
+
+if [[ -z "${NEW_NEXTCLOUD_VERSION}" ]]; then
+  die "Please set NEW_NEXTCLOUD_VERSION to the version of nextcloud you wish to update to"
+fi
+
+dokku() {
+  ssh -o LogLevel=QUIET -t $DOKKU_USER@$DOKKU_HOST "$@"
+}
+
+verify_dokku() {
+  debug "Checking connection to Dokku host at $DOKKU_HOST..."
+  result=`dokku version 2>&1`
+  local err=$?
+  debug "Dokku response: $result"
+  if [[ $err -ne 0 ]]; then
+    die "Unable to contact Dokku host"
+  fi
+  debug "OK - dokku on $DOKKU_HOST is responding correctly"
+}
+
+verify_dokku_nextcloud() {
+  debug "Checking for Dokku app $DOKKU_NEXTCLOUD_APP..."
+  result=`dokku apps:exists $DOKKU_NEXTCLOUD_APP`
+  local err=$?
+  debug "Exit code: $err"
+  if [[ $err -ne 0 ]]; then
+    die "The Dokku app $DOKKU_NEXTCLOUD_APP does not exists on $DOKKU_HOST"
+  fi
+  debug "OK - the app $DOKKU_NEXTCLOUD_APP exists on $DOKKU_HOST"
+}
+
+dokku_nextcloud_version() {
+  local build_options=$(dokku docker-options:report $DOKKU_NEXTCLOUD_APP 2>&1 | sed -n "s/Docker options build: *//p")
+  if [[ -n "${build_options}" ]]; then
+    debug "Current Docker build options: $build_options"
+    local version=$(echo $build_options | sed -n "s/^.*--build-arg NEXTCLOUD_VERSION=\([0-9.]*\).*/\1/p")
+    if [[ -n "${version}" ]]; then
+      debug "Currently installed version: $version"
+      eval "$1=$version"
+    fi
+  fi
+}
+
+unset_nextcloud_version() {
+  debug "Removing docker-option for the 'build' stage: --build-arg NEXTCLOUD_VERSION=$1"
+  dokku docker-options:remove $DOKKU_NEXTCLOUD_APP build "--build-arg NEXTCLOUD_VERSION=$1"
+}
+
+set_nextcloud_version() {
+  debug "Adding docker-option for the 'build' stage: --build-arg NEXTCLOUD_VERSION=$1"
+  dokku docker-options:add $DOKKU_NEXTCLOUD_APP build "--build-arg NEXTCLOUD_VERSION=$1"
+}
+
+update_nextcloud_version() {
+  local initial_nextcloud_version
+  dokku_nextcloud_version initial_nextcloud_version
+  if [[ -n "${initial_nextcloud_version}" ]]; then
+    unset_nextcloud_version $initial_nextcloud_version
+  fi
+  set_nextcloud_version $NEW_NEXTCLOUD_VERSION
+}
+
+verify_dokku
+verify_dokku_nextcloud
+update_nextcloud_version
+
+debug <<-MESSAGE
+Dokku app $DOKKU_NEXTCLOUD_APP at host $DOKKU_HOST is now set
+to deploy Nextcloud version $NEW_NEXTCLOUD_VERSION
+
+Now, you can run
+
+```sh
+git push dokku
+```
+
+to deploy the new version
+MESSAGE
