@@ -1,1 +1,2 @@
-FROM nextcloud:20.0-apache
+ARG NEXTCLOUD_VERSION=latest
+FROM nextcloud:$NEXTCLOUD_VERSION

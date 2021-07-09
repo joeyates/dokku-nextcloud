@@ -9,6 +9,12 @@ dokku apps:create nextcloud
 dokku postgres:link nextcloud nextcloud
 ```
 
+Choose which version of Nextcloud you want to deploy from [Docker Hub](https://hub.docker.com/_/nextcloud).
+
+```sh
+dokku docker-options:add nextcloud build "--build-arg NEXTCLOUD_VERSION={{put your version here}}"
+```
+
 Then, from your machine, after cloning this repo and adding `dokku` as a remote:
 
 ```sh
