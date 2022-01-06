@@ -9,6 +9,14 @@ dokku apps:create nextcloud
 dokku postgres:link nextcloud nextcloud
 ```
 
+# Redis
+
+```sh
+sudo dokku plugin:install https://github.com/dokku/dokku-redis.git redis
+dokku redis:create nextcloud
+dokku redis:link nextcloud nextcloud
+```
+
 Choose which version of Nextcloud you want to deploy from [Docker Hub](https://hub.docker.com/_/nextcloud).
 
 ```sh
