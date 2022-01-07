@@ -94,15 +94,11 @@ verify_dokku
 verify_dokku_nextcloud
 update_nextcloud_version
 
-debug <<-MESSAGE
-Dokku app $DOKKU_NEXTCLOUD_APP at host $DOKKU_HOST is now set
-to deploy Nextcloud version $NEW_NEXTCLOUD_VERSION
-
-Now, you can run
-
-```sh
-git push dokku
-```
-
-to deploy the new version
-MESSAGE
+debug "Dokku app $DOKKU_NEXTCLOUD_APP at host $DOKKU_HOST"
+debug "is now set to deploy Nextcloud version $NEW_NEXTCLOUD_VERSION"
+debug ""
+debug "Now, you can run"
+debug ""
+debug "git push dokku"
+debug ""
+debug "to deploy the new version"
