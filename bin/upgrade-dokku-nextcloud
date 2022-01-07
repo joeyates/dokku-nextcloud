@@ -4,11 +4,11 @@ set -o errtrace
 set -o nounset
 set -o pipefail
 
-DOKKU_HOST=${DOKKU_HOST:-""}
+: ${DOKKU_HOST:?Please set DOKKU_HOST to the host name of your Dokku host}
+: ${NEW_NEXTCLOUD_VERSION:?Please set NEW_NEXTCLOUD_VERSION to the version of nextcloud you wish to update to}
 DOKKU_USER=${DOKKU_USER:-dokku}
 DOKKU_NEXTCLOUD_APP=${DOKKU_NEXTCLOUD_APP:-nextcloud}
 LOG_LEVEL=${LOG_LEVEL:-1}
-NEW_NEXTCLOUD_VERSION=${1:-}
 
 log() {
   if [[ $LOG_LEVEL -ge 1 ]]; then
@@ -32,14 +32,6 @@ debug "DOKKU_USER: $DOKKU_USER"
 debug "DOKKU_NEXTCLOUD_APP: $DOKKU_NEXTCLOUD_APP"
 debug "LOG_LEVEL: $LOG_LEVEL"
 debug "NEW_NEXTCLOUD_VERSION: $NEW_NEXTCLOUD_VERSION"
-
-if [[ -z "${DOKKU_HOST}" ]]; then
-  die "Please set DOKKU_HOST to the host name of your Dokku host"
-fi
-
-if [[ -z "${NEW_NEXTCLOUD_VERSION}" ]]; then
-  die "Please set NEW_NEXTCLOUD_VERSION to the version of nextcloud you wish to update to"
-fi
 
 dokku() {
   ssh -o LogLevel=QUIET -t $DOKKU_USER@$DOKKU_HOST "$@"
