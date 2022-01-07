@@ -63,7 +63,7 @@ dokku_nextcloud_version() {
   local build_options=$(dokku docker-options:report $DOKKU_NEXTCLOUD_APP 2>&1 | sed -n "s/Docker options build: *//p")
   if [[ -n "${build_options}" ]]; then
     debug "Current Docker build options: $build_options"
-    local version=$(echo $build_options | sed -n "s/^.*--build-arg NEXTCLOUD_VERSION=\([0-9.]*\).*/\1/p")
+    local version=$(echo $build_options | sed -n "s/^.*--build-arg NEXTCLOUD_VERSION=\([-0-9.a-z]*\).*/\1/p")
     if [[ -n "${version}" ]]; then
       debug "Currently installed version: $version"
       eval "$1=$version"
