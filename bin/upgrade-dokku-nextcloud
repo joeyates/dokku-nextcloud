@@ -4,10 +4,6 @@ set -o errtrace
 set -o nounset
 set -o pipefail
 
-: ${DOKKU_HOST:?Please set DOKKU_HOST to the host name of your Dokku host}
-: ${NEW_NEXTCLOUD_VERSION:?Please set NEW_NEXTCLOUD_VERSION to the version of nextcloud you wish to update to}
-DOKKU_USER=${DOKKU_USER:-dokku}
-DOKKU_NEXTCLOUD_APP=${DOKKU_NEXTCLOUD_APP:-nextcloud}
 LOG_LEVEL=${LOG_LEVEL:-1}
 
 log() {
@@ -26,6 +22,16 @@ die() {
   echo "$@" >&2
   exit 1
 }
+
+if [[ $# -eq 0 ]]; then
+  die "Please pass the version of nextcloud you wish to update to as a parameter"
+fi
+
+NEW_NEXTCLOUD_VERSION=${1:-}
+
+: ${DOKKU_HOST:?Please set DOKKU_HOST to the host name of your Dokku host}
+DOKKU_USER=${DOKKU_USER:-dokku}
+DOKKU_NEXTCLOUD_APP=${DOKKU_NEXTCLOUD_APP:-nextcloud}
 
 debug "DOKKU_HOST: $DOKKU_HOST"
 debug "DOKKU_USER: $DOKKU_USER"
