@@ -33,7 +33,8 @@ Now back to your dokku server!
 
 ```sh
 dokku domains:add nextcloud <your domain>
-dokku letsencrypt nextcloud
+dokku letsencrypt:set nextcloud email EMAIL
+dokku letsencrypt:enable nextcloud
 # Replace this path with where you want to store user files (can be a network disk).
 mkdir -p /var/lib/dokku/data/storage/nextcloud/data
 chown www-data:www-data /var/lib/dokku/data/storage/nextcloud/data
