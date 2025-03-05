@@ -1,0 +1,16 @@
+{
+  "healthchecks": {
+    "web": [
+      {
+        "type": "startup",
+        "name": "health check",
+        "description": "Checking if the app responds to the /login path",
+        "path": "/login",
+        "content": "OK",
+        "wait": 1,
+        "attempts": 6
+      }
+    ]
+  }
+}
+
