@@ -145,6 +145,19 @@ Now you can just deploy as usual
 git push dokku
 ```
 
+## Admin Upgrade
+
+After installing a new version of nextcloud, an administrator must run the
+upgrade process.
+
+This can be done via the web UI, thought this does run the risk of timeouts
+on large installations. Otherwise, the upgrade can be run from the command line
+with the following command:
+
+```sh
+docker exec -u www-data -t nextcloud.web.1 /var/www/html/occ upgrade
+```
+
 ## Uninstalling
 If you're unhappy with your setup, this'll remove everything *forever*:
 ```
