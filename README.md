@@ -78,12 +78,11 @@ Make sure the value for `'overwrite.cli.url'` starts with https.
 You'll also need to allow large uploads to your server:
 
 ```sh
-mkdir /home/dokku/nextcloud/nginx.conf.d/
-echo 'client_max_body_size 50000m;' > /home/dokku/nextcloud/nginx.conf.d/upload.conf
-echo 'proxy_read_timeout 600s;' >> /home/dokku/nextcloud/nginx.conf.d/upload.conf
-chown dokku:dokku /home/dokku/nextcloud/nginx.conf.d/upload.conf
-service nginx reload
+dokku nginx:set nextcloud client-max-body-size 5G
+dokku nginx:set nextcloud proxy-read-timeout 600s
 ```
+
+Then restart nginx.
 
 ## Upgrading
 
